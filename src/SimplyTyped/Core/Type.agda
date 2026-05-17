@@ -1,5 +1,9 @@
 module SimplyTyped.Core.Type where
 
+private
+  variable
+    ty ty' : Set
+
 ----------------------------------------------------------------------------------------------------
 -- Type languages
 ----------------------------------------------------------------------------------------------------
@@ -29,3 +33,15 @@ private
 {-# NO_POSITIVITY_CHECK #-}
 data TyOf (lang : TyLang ι) : Set where
   of-feat : ∀ i → lang i (TyOf lang) → TyOf lang
+
+----------------------------------------------------------------------------------------------------
+-- Mapping
+----------------------------------------------------------------------------------------------------
+
+record MapTyFeat (feat : TyFeat) : Set₁ where
+  field
+    map-form : (ty → ty') → feat ty → feat ty'
+
+record MapTyLang (lang : TyLang ι) : Set₁ where
+  field
+    map-feat : ∀ i → MapTyFeat (lang i)

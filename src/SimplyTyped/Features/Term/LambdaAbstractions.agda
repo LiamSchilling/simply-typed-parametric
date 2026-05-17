@@ -31,7 +31,7 @@ lambda-feat .ne-form = NeForm
 lambda-feat .nf-form = NfForm
 
 ----------------------------------------------------------------------------------------------------
--- Algebra instances
+-- Mapping
 ----------------------------------------------------------------------------------------------------
 
 instance
@@ -43,4 +43,3 @@ instance
 
   inst-map-lambda-feat : MapTmFeat lambda-feat
   inst-map-lambda-feat = infer-map-tm-feat
-

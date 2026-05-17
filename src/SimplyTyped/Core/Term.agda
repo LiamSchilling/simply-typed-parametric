@@ -75,7 +75,7 @@ data NfOf lang where
   of-ne      : NeOf lang J → NfOf lang J
 
 ----------------------------------------------------------------------------------------------------
--- Algebra
+-- Mapping
 ----------------------------------------------------------------------------------------------------
 
 record MapTmForm (form : TmForm jdg) : Set₁ where
@@ -101,20 +101,14 @@ instance
   infer-map-tm-feat {{F-ne}} {{F-nf}} .map-ne-form = F-ne
   infer-map-tm-feat {{F-ne}} {{F-nf}} .map-nf-form = F-nf
 
-----------------------------------------------------------------------------------------------------
--- Casting
-----------------------------------------------------------------------------------------------------
-
 -- Cast a neutral or normal term into the general set of terms.
 -- It terminates as long as the `MapTmLang` argument is a proper homomorphic map,
 -- only applying the mapping functions to elements that are strictly smaller than the input. 
 {-# TERMINATING #-}
-ne-to-tm-of-map : {{MapTmLang lang}} → NeOf lang J → TmOf lang J
-nf-to-tm-of-map : {{MapTmLang lang}} → NfOf lang J → TmOf lang J
-ne-to-tm-of-map {{F}} (of-ne-form i t) = tm-of-ne-form i (
-                                          F .map-feat i .map-ne-form
-                                          .map-form ne-to-tm-of-map nf-to-tm-of-map t)
-nf-to-tm-of-map {{F}} (of-nf-form i t) = tm-of-nf-form i (
-                                          F .map-feat i .map-nf-form
-                                          .map-form ne-to-tm-of-map nf-to-tm-of-map t)
-nf-to-tm-of-map {{F}} (of-ne t)        = ne-to-tm-of-map t
+ne-to-tm : {{MapTmLang lang}} → NeOf lang J → TmOf lang J
+nf-to-tm : {{MapTmLang lang}} → NfOf lang J → TmOf lang J
+ne-to-tm {{F}} (of-ne-form i t) = tm-of-ne-form i
+                                  (F .map-feat i .map-ne-form .map-form ne-to-tm nf-to-tm t)
+nf-to-tm {{F}} (of-nf-form i t) = tm-of-nf-form i
+                                  (F .map-feat i .map-nf-form .map-form ne-to-tm nf-to-tm t)
+nf-to-tm {{F}} (of-ne t)        = ne-to-tm t
