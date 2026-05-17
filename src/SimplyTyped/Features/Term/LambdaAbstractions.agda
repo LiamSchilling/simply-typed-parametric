@@ -6,6 +6,7 @@ open import SimplyTyped.Judgments using (TyJdg; _⊢_)
 
 open TmFeat
 open MapTmForm
+open MapTmFeat
 
 private
   variable
@@ -42,4 +43,5 @@ instance
   inst-map-nf-form .map-form map-ne map-nf (lam-form t') = lam-form (map-nf t')
 
   inst-map-lambda-feat : MapTmFeat lambda-feat
-  inst-map-lambda-feat = infer-map-tm-feat
+  inst-map-lambda-feat .map-ne-form = inst-map-ne-form
+  inst-map-lambda-feat .map-nf-form = inst-map-nf-form

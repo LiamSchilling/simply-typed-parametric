@@ -80,7 +80,9 @@ data NfOf lang where
 
 record MapTmForm (form : TmForm jdg) : Set₁ where
   field
-    map-form : (∀ {J'} → ne J' → ne' J') → (∀ {J'} → nf J' → nf' J') → form ne nf J → form ne' nf' J
+    map-form : (∀ {J'} → ne J' → ne' J') →
+               (∀ {J'} → nf J' → nf' J') →
+               form ne nf J → form ne' nf' J
 
 record MapTmFeat (feat : TmFeat jdg) : Set₁ where
   field
@@ -95,19 +97,60 @@ open MapTmForm
 open MapTmFeat
 open MapTmLang
 
-instance
-  infer-map-tm-feat : {{MapTmForm ne-form'}} → {{MapTmForm nf-form'}} →
-                      MapTmFeat record { ne-form = ne-form'; nf-form = nf-form' }
-  infer-map-tm-feat {{F-ne}} {{F-nf}} .map-ne-form = F-ne
-  infer-map-tm-feat {{F-ne}} {{F-nf}} .map-nf-form = F-nf
-
 -- Cast a neutral or normal term into the general set of terms.
 -- It terminates as long as the `MapTmLang` argument is a proper homomorphic map.
 {-# TERMINATING #-}
 ne-to-tm : {{MapTmLang lang}} → NeOf lang J → TmOf lang J
 nf-to-tm : {{MapTmLang lang}} → NfOf lang J → TmOf lang J
-ne-to-tm {{F}} (of-ne-form i t) = tm-of-ne-form i
-                                  (F .map-feat i .map-ne-form .map-form ne-to-tm nf-to-tm t)
-nf-to-tm {{F}} (of-nf-form i t) = tm-of-nf-form i
-                                  (F .map-feat i .map-nf-form .map-form ne-to-tm nf-to-tm t)
+ne-to-tm {{F}} (of-ne-form i t) = tm-of-ne-form i (
+                                  F .map-feat i .map-ne-form
+                                  .map-form ne-to-tm nf-to-tm t)
+nf-to-tm {{F}} (of-nf-form i t) = tm-of-nf-form i (
+                                  F .map-feat i .map-nf-form
+                                  .map-form ne-to-tm nf-to-tm t)
 nf-to-tm {{F}} (of-ne t)        = ne-to-tm t
+
+----------------------------------------------------------------------------------------------------
+-- Semantics
+----------------------------------------------------------------------------------------------------
+
+module _ (denote-jdg : jdg → Set) where
+
+  record DenoteTmForm (form : TmForm jdg) : Set₁ where
+    field
+      denote-form : (∀ {J'} → ne J' → denote-jdg J') →
+                    (∀ {J'} → nf J' → denote-jdg J') →
+                    form ne nf J → denote-jdg J
+
+  record DenoteTmFeat (feat : TmFeat jdg) : Set₁ where
+    field
+      denote-ne-form : DenoteTmForm (feat .ne-form)
+      denote-nf-form : DenoteTmForm (feat .nf-form)
+
+  record DenoteTmLang (lang : TmLang ι jdg) : Set₁ where
+    field
+      denote-feat : ∀ i → DenoteTmFeat (lang i)
+
+  open DenoteTmForm
+  open DenoteTmFeat
+  open DenoteTmLang
+
+  -- Denote a term into a semantic object.
+  -- It terminates as long as the `DenoteTmLang` argument is a proper one-step fold.
+  {-# TERMINATING #-}
+  denote-tm : {{DenoteTmLang lang}} → TmOf lang J → denote-jdg J
+  denote-tm {{D}} (tm-of-ne-form i t) = D .denote-feat i .denote-ne-form
+                                        .denote-form denote-tm denote-tm t
+  denote-tm {{D}} (tm-of-nf-form i t) = D .denote-feat i .denote-nf-form
+                                        .denote-form denote-tm denote-tm t
+
+  -- Denote a neutral or normal term into a semantic object.
+  -- It terminates as long as the `DenoteTmLang` argument is a proper one-step fold.
+  {-# TERMINATING #-}
+  denote-ne : {{DenoteTmLang lang}} → NeOf lang J → denote-jdg J
+  denote-nf : {{DenoteTmLang lang}} → NfOf lang J → denote-jdg J
+  denote-ne {{D}} (of-ne-form i t) = D .denote-feat i .denote-ne-form
+                                     .denote-form denote-ne denote-nf t
+  denote-nf {{D}} (of-nf-form i t) = D .denote-feat i .denote-nf-form
+                                     .denote-form denote-ne denote-nf t
+  denote-nf {{D}} (of-ne t)        = denote-ne t
