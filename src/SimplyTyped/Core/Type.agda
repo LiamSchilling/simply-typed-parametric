@@ -21,7 +21,8 @@ TyLang ι = ι → TyFeat
 
 private
   variable
-    ι : Set
+    ι    : Set
+    lang : TyLang ι
 
 ----------------------------------------------------------------------------------------------------
 -- Sets of types
@@ -45,3 +46,24 @@ record MapTyFeat (feat : TyFeat) : Set₁ where
 record MapTyLang (lang : TyLang ι) : Set₁ where
   field
     map-feat : ∀ i → MapTyFeat (lang i)
+
+----------------------------------------------------------------------------------------------------
+-- Semantics
+----------------------------------------------------------------------------------------------------
+
+record DenoteTyFeat (feat : TyFeat) : Set₁ where
+  field
+    denote-form : (ty → Set) → feat ty → Set
+
+record DenoteTyLang (lang : TyLang ι) : Set₁ where
+  field
+    denote-feat : ∀ i → DenoteTyFeat (lang i)
+
+open DenoteTyFeat
+open DenoteTyLang
+
+-- Denote a type into a set of semantic objects.
+-- It terminates as long as the `DenoteTyLang` argument is a proper one-step fold.
+{-# TERMINATING #-}
+denote-ty : {{DenoteTyLang lang}} → TyOf lang → Set
+denote-ty {{D}} (of-feat i t) = D .denote-feat i .denote-form denote-ty t

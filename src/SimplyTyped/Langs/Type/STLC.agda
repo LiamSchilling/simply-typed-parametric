@@ -2,11 +2,14 @@ module SimplyTyped.Langs.Type.STLC (α : Set) where
 
 open import SimplyTyped.Judgments using (TyJdg)
 open import SimplyTyped.Judgments using (_⊢_) public
-open import SimplyTyped.Core.Type
-open import SimplyTyped.Features.Type.Atoms α
+open import SimplyTyped.Core.Type hiding (denote-ty)
+open import SimplyTyped.Core.Type using (denote-ty) public
+open import SimplyTyped.Features.Type.Atoms α hiding (DenoteAtom)
+open import SimplyTyped.Features.Type.Atoms α using (DenoteAtom) public
 open import SimplyTyped.Features.Type.Arrow
 
 open MapTyLang
+open DenoteTyLang
 
 ----------------------------------------------------------------------------------------------------
 -- Assemble the type language
@@ -40,3 +43,12 @@ instance
   inst-map-ty-lang : MapTyLang ty-lang
   inst-map-ty-lang .map-feat atom-idx  = inst-map-atom-feat
   inst-map-ty-lang .map-feat arrow-idx = inst-map-arrow-feat
+
+----------------------------------------------------------------------------------------------------
+-- Semantics
+----------------------------------------------------------------------------------------------------
+
+instance
+  inst-denote-ty-lang : {{DenoteAtom}} → DenoteTyLang ty-lang
+  inst-denote-ty-lang .denote-feat atom-idx  = inst-denote-atom-feat
+  inst-denote-ty-lang .denote-feat arrow-idx = inst-denote-arrow-feat

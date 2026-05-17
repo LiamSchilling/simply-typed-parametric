@@ -102,8 +102,7 @@ instance
   infer-map-tm-feat {{F-ne}} {{F-nf}} .map-nf-form = F-nf
 
 -- Cast a neutral or normal term into the general set of terms.
--- It terminates as long as the `MapTmLang` argument is a proper homomorphic map,
--- only applying the mapping functions to elements that are strictly smaller than the input. 
+-- It terminates as long as the `MapTmLang` argument is a proper homomorphic map.
 {-# TERMINATING #-}
 ne-to-tm : {{MapTmLang lang}} → NeOf lang J → TmOf lang J
 nf-to-tm : {{MapTmLang lang}} → NfOf lang J → TmOf lang J

@@ -1,8 +1,8 @@
 module SimplyTyped.Langs.Term.DeBruijnVarSTLC (α : Set) where
 
 open import Data.List using (List; _∷_; lookup)
-open import SimplyTyped.Langs.Type.STLC α public
-open import SimplyTyped.Core.Term
+open import SimplyTyped.Langs.Type.STLC α
+open import SimplyTyped.Core.Term hiding (ne-to-tm; nf-to-tm)
 open import SimplyTyped.Core.Term using (ne-to-tm; nf-to-tm) public
 open import SimplyTyped.Features.Term.DeBruijnVariables Ty
 open import SimplyTyped.Features.Term.LambdaAbstractions Ty arrow
